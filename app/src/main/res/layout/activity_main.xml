@@ -34,6 +34,7 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/login_signup_viewpager"
         android:layout_width="0dp"
+        android:overScrollMode="never"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="@+id/login_signup_tab"
         app:layout_constraintStart_toStartOf="@+id/login_signup_tab"

@@ -16,14 +16,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_begin="50dp" />
+            app:layout_constraintGuide_begin="20dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/end_guideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="50dp" />
+            app:layout_constraintGuide_end="20dp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/username_container"
@@ -71,6 +71,7 @@
             android:text="Login"
             android:layout_marginTop="50dp"
             app:cornerRadius="7dp"
+            android:textAllCaps="false"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             app:layout_constraintEnd_toStartOf="@+id/end_guideline"
