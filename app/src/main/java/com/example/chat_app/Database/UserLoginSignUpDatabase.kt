@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 
 
-@Database(entities = [SqlUserEntity::class], views = [], version = 1,exportSchema = false)
+@Database(entities = [SqlUserEntity::class], views = [], version = 2,exportSchema = false)
 abstract class UserLoginSignUpDatabase : RoomDatabase() {
     abstract fun getUserLoginDao():UserLoginDao
 
@@ -22,7 +22,7 @@ abstract class UserLoginSignUpDatabase : RoomDatabase() {
                     context,
                     UserLoginSignUpDatabase::class.java,
                     "UserLoginSignUpDatabase.db"
-                ).allowMainThreadQueries().build()
+                ).fallbackToDestructiveMigration().allowMainThreadQueries().build()
             }
 
             return userLoginSignUpDatabase

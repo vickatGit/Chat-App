@@ -8,18 +8,19 @@ class SqlUserEntity {
     @PrimaryKey
     var id:Int=1
     lateinit var username:String
-    lateinit var password:String
+    lateinit var dataId:String
 
-    constructor(id: Int?, username: String, password: String) {
+    constructor(id: Int?, username: String, dataId:String) {
         if (id != null) {
             this.id = id
         }
         this.username = username
-        this.password = password
+        this.dataId=dataId
     }
 
     override fun toString(): String {
-        return "SqlUserEntity(id=$id, username='$username', password='$password')"
+        return "SqlUserEntity(id=$id, username='$username', dataId='$dataId')"
     }
+
 
 }

@@ -1,5 +1,6 @@
 package com.example.chat_app.Fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +10,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.chat_app.ChatsActivity
+import com.example.chat_app.Database.SqlUserEntity
+import com.example.chat_app.Database.UserLoginSignUpDatabase
+import com.example.chat_app.MainActivity
 import com.example.chat_app.Network.Network.User
 import com.example.chat_app.R
 import com.example.chat_app.ViewModels.LoginViewModel
@@ -45,6 +50,13 @@ class LoginFragment : Fragment() {
         loginViewModel=ViewModelProvider(this).get(LoginViewModel::class.java)
         val observer= Observer<User> {
             Log.d("TAG", "Login View Observer : "+it.userId  )
+            if(it!=null){
+                UserLoginSignUpDatabase.getInstance(MainActivity.context)?.getUserLoginDao()?.insertUser(
+                    SqlUserEntity(null, username.text.toString(),it.toString()))
+                Log.d("TAG","onViewCreated: in sqLite Database " + UserLoginSignUpDatabase.getInstance(this.requireContext())?.getUserLoginDao()?.getUser())
+                val intent= Intent(this.context, ChatsActivity::class.java)
+                startActivity(intent)
+            }
         }
         loginViewModel.isUser().observe(this.viewLifecycleOwner,observer)
         initialise(view)
