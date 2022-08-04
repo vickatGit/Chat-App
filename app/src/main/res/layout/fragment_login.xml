@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="top"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.LoginFragment">
 
@@ -66,6 +67,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/login"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Login"
