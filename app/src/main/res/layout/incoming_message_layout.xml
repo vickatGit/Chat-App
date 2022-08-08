@@ -15,6 +15,7 @@
 
         <TextView
             android:id="@+id/inc_message"
+            android:background="@drawable/incoming_message_background"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxWidth="300dp"

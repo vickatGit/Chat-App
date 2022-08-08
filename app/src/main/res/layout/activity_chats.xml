@@ -27,15 +27,16 @@
 
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:gravity="center_horizontal"
         android:text="Messages"
-        android:layout_gravity="center_vertical"
+        android:textColor="@color/black"
         android:textSize="21sp"
         app:layout_constraintBottom_toBottomOf="@+id/user_profile"
         app:layout_constraintEnd_toStartOf="@+id/user_profile"
         app:layout_constraintStart_toEndOf="@+id/search_user"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/search_user" />
 
 <!--    <LinearLayout-->
 <!--        android:layout_width="wrap_content"-->
@@ -55,15 +56,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search_user" />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/user_profile"
         android:layout_width="42dp"
         android:layout_height="45dp"
-        android:layout_marginTop="8dp"
+
 
         android:background="@drawable/user_profile_background"
         android:src="@drawable/default_profile"
+        android:layout_marginEnd="10dp"
+
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/search_user"
+        app:layout_constraintTop_toTopOf="@+id/search_user" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
