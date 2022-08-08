@@ -14,10 +14,13 @@ import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.res.ResourcesCompat.*
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.chat_app.Adapters.SearchUsersAdapter
 import com.example.chat_app.Network.Network.User
 import com.example.chat_app.ViewModels.ChatsActivityViewModel
@@ -51,14 +54,15 @@ class ChatsActivity : AppCompatActivity() {
             val data=it.data
             val imageInputStream=contentResolver.openInputStream(data?.data!!)
             val profilePic:Bitmap=BitmapFactory.decodeStream(imageInputStream)
-            Glide.with(this).load(profilePic).into(userProfile)
+            val options=RequestOptions().override(200,200)
+            Glide.with(this).apply { options }.load(profilePic).into(userProfile)
 
             val bytes:ByteArrayOutputStream= ByteArrayOutputStream()
-            profilePic.compress(Bitmap.CompressFormat.JPEG,50,bytes)
+            profilePic.compress(Bitmap.CompressFormat.PNG,100,bytes)
             val path : String=MediaStore.Images.Media.insertImage(contentResolver,profilePic,"user_profile","some")!!
 
 
-            firebaseStorage.reference.child("profile pictures").putFile(Uri.parse(path))
+            firebaseStorage.reference.child("profile pictures"+id).putFile(Uri.parse(path))
                 .addOnSuccessListener {
                     val url = it.metadata?.reference?.downloadUrl
 
@@ -114,9 +118,8 @@ class ChatsActivity : AppCompatActivity() {
         userProfile=findViewById(R.id.user_profile)
         searchView= findViewById(R.id.search_user)
         header=findViewById(R.id.chats_activity_header)
+        header.setTypeface(getFont(this,R.font.montserratbold))
         Firebase.firestore.collection("USERS").document(id).get().addOnSuccessListener {
-
-//            Glide.with(this).load(it.get("user_profile")).into(userProfile)
             db.collection("USERS").document(id).get().addOnSuccessListener {
                 val url=it.get("user_profile").toString()
 
@@ -125,9 +128,6 @@ class ChatsActivity : AppCompatActivity() {
             }
 
         }
-//        this.supportActionBar!!.displayOptions=ActionBar.DISPLAY_SHOW_CUSTOM
-//        this.supportActionBar!!.setDisplayShowCustomEnabled(true)
-//        this.supportActionBar!!.setCustomView(view)
 
         userProfile.setOnClickListener {
             Log.d("TAG", "onCreate: userProfile clicked")

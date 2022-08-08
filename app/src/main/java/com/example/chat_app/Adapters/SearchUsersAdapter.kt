@@ -10,7 +10,9 @@ import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.chat_app.ChatActivity
 import com.example.chat_app.MainActivity
 import com.example.chat_app.Network.Network.User
@@ -32,13 +34,15 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
 
     override fun onBindViewHolder(holder: SearchUserViewHolder, position: Int) {
         holder.userName.text=newUserList.get(position).username
+        holder.userName.setTypeface(ResourcesCompat.getFont(holder.userName.context,R.font.montserratmedium))
+        Glide.with(holder.userProfile.context).load(newUserList.get(position).password).into(holder.userProfile)
         holder.user.setOnClickListener{
             val intent = Intent(holder.user.context,ChatActivity::class.java)
             val bundle=Bundle()
             bundle.putParcelable("user",newUserList.get(position))
             intent.putExtra("user",bundle)
             intent.putExtra("userid",userId)
-            MainActivity.context.startActivity(intent)
+            holder.user.context.startActivity(intent)
         }
     }
 
@@ -66,7 +70,8 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
                         it.result.documents.forEach{
                             Log.d(SearchUsersAdapter.TAG, "InFiltering: "+it.get("username"))
 
-                            val us=User(null,it.get("username").toString(),"")
+                            val us=User(it.get("userid").toString().toInt(),it.get("username").toString(),it.get("user_profile").toString())
+
                             filters.add(us)
                             newUserList.add(us)
                             publishResults(constraint,FilterResults().apply { values=filters })

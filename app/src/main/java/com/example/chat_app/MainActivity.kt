@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        context=this
         if(UserLoginSignUpDatabase.getInstance(this)?.getUserLoginDao()?.getUser()?.dataId!=null){
             val intent= Intent(this,ChatsActivity::class.java)
             val id=UserLoginSignUpDatabase.getInstance(this)?.getUserLoginDao()?.getUser()?.dataId
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-        context=this
+
 
         initialise()
         loginSignupAdapter= ViewPagerAdapter(supportFragmentManager,lifecycle)

@@ -3,11 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/android studio/Chat_App/app/src/main/res/drawable/incoming_message_background.xml" value="0.13385416666666666" />
         <entry key="..\:/android studio/Chat_App/app/src/main/res/drawable/message_background.xml" value="0.2890625" />
+        <entry key="..\:/android studio/Chat_App/app/src/main/res/drawable/message_input_background.xml" value="0.2630208333333333" />
+        <entry key="..\:/android studio/Chat_App/app/src/main/res/drawable/outgoing_message_background.xml" value="0.2890625" />
         <entry key="..\:/android studio/Chat_App/app/src/main/res/drawable/user_profile_background.xml" value="0.12760416666666666" />
         <entry key="..\:/android studio/Chat_App/app/src/main/res/layout/activity_chat.xml" value="0.27291666666666664" />
         <entry key="..\:/android studio/Chat_App/app/src/main/res/layout/activity_chats.xml" value="0.2296875" />
         <entry key="..\:/android studio/Chat_App/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/android studio/Chat_App/app/src/main/res/layout/chat_activity_header.xml" value="0.246875" />
         <entry key="..\:/android studio/Chat_App/app/src/main/res/layout/chat_thumbnail_layout.xml" value="0.21" />
         <entry key="..\:/android studio/Chat_App/app/src/main/res/layout/custom_chats_action_bar.xml" value="0.27291666666666664" />
         <entry key="..\:/android studio/Chat_App/app/src/main/res/layout/fragment_login.xml" value="0.2520833333333333" />

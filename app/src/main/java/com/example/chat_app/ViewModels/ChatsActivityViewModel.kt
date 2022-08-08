@@ -9,7 +9,8 @@ class ChatsActivityViewModel : ViewModel() {
     private val db=Firebase.firestore
     fun setUser(userId: String?, userName: String?){
         val data=hashMapOf(
-            "username" to userName
+            "username" to userName,
+            "userid" to userId
         )
         db.collection("USERS").document(userId.toString()).set(data, SetOptions.merge())
 
