@@ -1,5 +1,7 @@
 package com.example.chat_app.Adapters
 
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +11,14 @@ import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.chat_app.ChatActivity
+import com.example.chat_app.MainActivity
 import com.example.chat_app.Network.Network.User
 import com.example.chat_app.R
-import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class SearchUsersAdapter(var newUserList: ArrayList<String>) : RecyclerView.Adapter<SearchUsersAdapter.SearchUserViewHolder>(), Filterable{
+class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : RecyclerView.Adapter<SearchUsersAdapter.SearchUserViewHolder>(), Filterable{
 
 
     val db=Firebase.firestore
@@ -29,7 +31,15 @@ class SearchUsersAdapter(var newUserList: ArrayList<String>) : RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: SearchUserViewHolder, position: Int) {
-        holder.userName.text=newUserList.get(position)
+        holder.userName.text=newUserList.get(position).username
+        holder.user.setOnClickListener{
+            val intent = Intent(holder.user.context,ChatActivity::class.java)
+            val bundle=Bundle()
+            bundle.putParcelable("user",newUserList.get(position))
+            intent.putExtra("user",bundle)
+            intent.putExtra("userid",userId)
+            MainActivity.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -39,11 +49,12 @@ class SearchUsersAdapter(var newUserList: ArrayList<String>) : RecyclerView.Adap
     class SearchUserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val userProfile:ImageView=itemView.findViewById(R.id.thumb_user_profile)
         val userName:TextView=itemView.findViewById(R.id.thumb_user_name)
+        val user:View=itemView
     }
 
     override fun getFilter(): Filter {
         return object :Filter(){
-            var filters = ArrayList<String>()
+            var filters = ArrayList<User>()
             override fun performFiltering(constraint: CharSequence?): FilterResults? {
                 Log.d(TAG, "performFiltering: ")
                 val data=hashMapOf(
@@ -54,8 +65,10 @@ class SearchUsersAdapter(var newUserList: ArrayList<String>) : RecyclerView.Adap
                         Log.d(TAG, "performFiltering: size of it ${it.result.documents.size}" )
                         it.result.documents.forEach{
                             Log.d(SearchUsersAdapter.TAG, "InFiltering: "+it.get("username"))
-                            filters.add(it.get("username").toString())
-                            newUserList.add(it.get("username").toString())
+
+                            val us=User(null,it.get("username").toString(),"")
+                            filters.add(us)
+                            newUserList.add(us)
                             publishResults(constraint,FilterResults().apply { values=filters })
                         }
                     }
@@ -75,7 +88,7 @@ class SearchUsersAdapter(var newUserList: ArrayList<String>) : RecyclerView.Adap
                     newUserList.clear()
                     Log.d(TAG, "publishResults: "+results.values.toString())
 
-                    newUserList.addAll(results.values as Collection<String>)
+                    newUserList.addAll(results.values as Collection<User>)
                     notifyDataSetChanged()
                 }
             }

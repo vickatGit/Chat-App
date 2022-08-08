@@ -11,7 +11,7 @@ import kotlinx.android.parcel.Parcelize
 data class User(
 
     @Nullable
-    val userId: Int?,
+    var userId:Int?,
     val username:String,
     @Ignore
     val password:String

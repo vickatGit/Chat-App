@@ -6,9 +6,64 @@
     android:layout_height="match_parent"
     tools:context=".ChatsActivity">
 
+
+<!--    <include-->
+<!--        android:id="@+id/chats_acton_bar"-->
+<!--        layout="@layout/custom_chats_action_bar"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <SearchView
+        android:id="@+id/search_user"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="7dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chats_activity_header"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:text="Messages"
+        android:layout_gravity="center_vertical"
+        android:textSize="21sp"
+        app:layout_constraintBottom_toBottomOf="@+id/user_profile"
+        app:layout_constraintEnd_toStartOf="@+id/user_profile"
+        app:layout_constraintStart_toEndOf="@+id/search_user"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_weight="1"-->
+<!--        android:gravity="end"-->
+<!--        android:orientation="horizontal">-->
+
+<!--    </LinearLayout>-->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/allChats"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_user" />
+
+    <ImageView
+        android:id="@+id/user_profile"
+        android:layout_width="42dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="8dp"
+
+        android:background="@drawable/user_profile_background"
+        android:src="@drawable/default_profile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

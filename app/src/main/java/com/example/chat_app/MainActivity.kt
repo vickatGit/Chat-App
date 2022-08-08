@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         if(UserLoginSignUpDatabase.getInstance(this)?.getUserLoginDao()?.getUser()?.dataId!=null){
             val intent= Intent(this,ChatsActivity::class.java)
-//            Log.d("TAG", "onCreate: originsl id"+UserLoginSignUpDatabase.getInstance(this)?.getUserLoginDao()?.getUser()?.username)
             val id=UserLoginSignUpDatabase.getInstance(this)?.getUserLoginDao()?.getUser()?.dataId
             intent.putExtra(USER_NAME,UserLoginSignUpDatabase.getInstance(this)?.getUserLoginDao()?.getUser()?.username)
             intent.putExtra(USER_ID,id.toString())
