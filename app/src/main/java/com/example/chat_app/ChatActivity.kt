@@ -3,12 +3,10 @@ package com.example.chat_app
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import androidx.core.content.res.ResourcesCompat.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -27,32 +25,36 @@ import kotlin.collections.ArrayList
 class ChatActivity : AppCompatActivity() {
     val db=Firebase.firestore
 
-    private lateinit var message:EditText
+    private lateinit var messageInput:EditText
     private lateinit var userName:TextView
     private lateinit var userProfile:ImageView
     private lateinit var back:ImageView
     private lateinit var send:FloatingActionButton
     private lateinit var chats:RecyclerView
     private lateinit var messages:ArrayList<MessageModel>
+    private lateinit var recieverMessages:ArrayList<MessageModel>
     private lateinit var chatAdapter:chatRecyclerAdapter
+    private lateinit var friends:ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         messages= ArrayList(1)
+        recieverMessages= ArrayList(1)
+        friends=ArrayList(1)
 
         val bundle=intent.getBundleExtra("user")
         val user: User? =bundle?.getParcelable<User>("user")
         val id=intent.getIntExtra("userid",-1)
         Log.d("TAG", "onCreate: user to send"+id)
-        message=findViewById(R.id.message)
+        messageInput=findViewById(R.id.message)
         send=findViewById(R.id.send)
         userProfile=findViewById(R.id.user_profile)
         userName=findViewById(R.id.username)
         back=findViewById(R.id.back)
         chats=findViewById(R.id.chats)
 
-        message.setTypeface(getFont(this,R.font.montserratmedium))
+        messageInput.setTypeface(getFont(this,R.font.montserratmedium))
         userName.setTypeface(getFont(this,R.font.montserratmedium))
         userName.text=user?.username
         Glide.with(this).load(user?.password).into(userProfile)
@@ -63,26 +65,67 @@ class ChatActivity : AppCompatActivity() {
 
 
         val db=Firebase.firestore
-        db.collection("MESSAGES").whereIn("from" , listOf(id,user!!.userId)).addSnapshotListener(
+
+        db.collection("MESSAGES").whereIn("from" , listOf(id,user!!.userId)).whereEqualTo("to",id).addSnapshotListener(
+            EventListener { value, error ->
+                Log.d("TAG", "onCreate: in snapshot listener  reciever id is $id and sender id is ${user.userId} "+value?.documents?.size)
+                recieverMessages.clear()
+                value?.documents?.listIterator()?.forEach {
+                    val message=MessageModel(it.get("message").toString()
+                        ,it.get("from").toString().toInt()
+                        ,it.get("to").toString().toInt(),it.getTimestamp("createdAt")!!)
+                    Log.d("TAG", "onCreate: ChatsActivity message "+message.toString())
+                    recieverMessages.add(message)
+
+                }
+                messages.addAll(recieverMessages)
+                messages.sortBy { it.createdAt }
+                chatAdapter.notifyDataSetChanged()
+                if(recieverMessages.size>=0) {
+                    Log.d("TAG", "onCreate: size of messages  "+chatAdapter.itemCount)
+//                    chats.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                }
+            })
+        db.collection("MESSAGES").whereIn("from" , listOf(id,user!!.userId)).whereEqualTo("to",user!!.userId).addSnapshotListener(
             EventListener { value, error ->
                 Log.d("TAG", "onCreate: in snapshot listener")
-                value?.documentChanges?.listIterator()?.forEach {
-                    val message=MessageModel(it.document.get("message").toString()
-                        ,it.document.get("from").toString().toInt()
-                        ,it.document.get("to").toString().toInt(),it.document.getTimestamp("createdAt")!!)
+                messages.clear()
+                value?.documents?.listIterator()?.forEach {
+                    val message=MessageModel(it.get("message").toString()
+                        ,it.get("from").toString().toInt()
+                        ,it.get("to").toString().toInt(),it.getTimestamp("createdAt")!!)
                     Log.d("TAG", "onCreate: ChatsActivity message "+message.toString())
                     messages.add(message)
 
                 }
+
+                    messages.addAll(recieverMessages)
                     messages.sortBy { it.createdAt }
                     chatAdapter.notifyDataSetChanged()
-                chats.smoothScrollToPosition(chatAdapter.itemCount-1)
+                if(messages.size>=0) {
+                    Log.d("TAG", "onCreate: size of messages  "+chatAdapter.itemCount)
+//                    chats.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                }
+            })
+
+
+        db.collection("USERS").document(id.toString()).get().addOnCompleteListener(
+            OnCompleteListener {
+                friends = it.result.data?.get("friends") as ArrayList<String>
+                friends.add(id.toString())
+
+            })
+
+        db.collection("USERS").document(id.toString()).update("friends",friends).addOnCompleteListener(
+            OnCompleteListener {
+                Log.d("TAG", "onCreate: friend added successfully")
             })
         back.setOnClickListener {
             finish()
         }
         send.setOnClickListener {
-            val message=MessageModel(message.text.toString(),id!!.toInt(),user!!.userId!!,Timestamp(Date()))
+            val message=MessageModel(messageInput.text.toString(),id!!.toInt(),user!!.userId!!,Timestamp(Date()))
+            messageInput.setText("")
             db.collection("MESSAGES").document().set(message).addOnCompleteListener(
                 OnCompleteListener {
                     if(it.isSuccessful){
@@ -91,6 +134,7 @@ class ChatActivity : AppCompatActivity() {
                     else
                         Log.d("TAG", "onCreate: failed ro store meaage"+it.exception)
                 })
+
 
 
         }
