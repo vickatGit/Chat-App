@@ -216,6 +216,7 @@ class ChatsActivity : AppCompatActivity() {
             header.visibility=View.GONE
             allFriends.visibility=View.GONE
             allSearches.visibility=View.VISIBLE
+            searchView.setMaxWidth(Integer.MAX_VALUE)
         }
         
         searchView.setOnCloseListener (object :SearchView.OnCloseListener{
