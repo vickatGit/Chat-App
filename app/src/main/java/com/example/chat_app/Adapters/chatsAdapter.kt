@@ -1,0 +1,50 @@
+package com.example.chat_app.Adapters
+
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.chat_app.ChatActivity
+import com.example.chat_app.Database.FirestoreObject
+import com.example.chat_app.Network.Network.User
+import com.example.chat_app.R
+
+class chatsAdapter(val friends:ArrayList<FirestoreObject>,val userId:Int) : RecyclerView.Adapter<chatsAdapter.chatsThumbHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): chatsThumbHolder {
+        val view=LayoutInflater.from(parent.context).inflate(R.layout.chats_thumbnail,parent,false)
+        return chatsThumbHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: chatsThumbHolder, position: Int) {
+        Log.d("TAG", "onBindViewHolder: chatsAdapter")
+        holder.userName.text=friends.get(position).username
+        Glide.with(holder.user_profile.context).load(friends.get(position).user_profile).into(holder.user_profile)
+        holder.user.setOnClickListener{
+            val intent = Intent(holder.user.context, ChatActivity::class.java)
+            val bundle= Bundle()
+            val friend=friends.get(position)
+            val user= User(friend.userid.toInt(),friend.username,friend.user_profile.toString())
+            bundle.putParcelable("user",user)
+            intent.putExtra("user",bundle)
+            Log.d("TAG", "onBindViewHolder: in chatsAdapter id is"+userId)
+            intent.putExtra("userid",userId)
+            holder.user.context.startActivity(intent)
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return friends.size
+    }
+    class chatsThumbHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        val user_profile:ImageView=itemView.findViewById(R.id.thumb_user_profile)
+        val userName:TextView=itemView.findViewById(R.id.thumb_user_name)
+        val latestMessage:TextView=itemView.findViewById(R.id.latest_message)
+        val user:View=itemView
+    }
+}
