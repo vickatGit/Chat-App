@@ -24,6 +24,7 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
 
 
     val db=Firebase.firestore
+    val searchedUserList=newUserList
     companion object{
         public var TAG="tag"
     }
@@ -33,6 +34,7 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
     }
 
     override fun onBindViewHolder(holder: SearchUserViewHolder, position: Int) {
+        Log.d(TAG, "onBindViewHolder: ")
         holder.userName.text=newUserList.get(position).username
         holder.userName.setTypeface(ResourcesCompat.getFont(holder.userName.context,R.font.montserratmedium))
         Glide.with(holder.userProfile.context).load(newUserList.get(position).password).into(holder.userProfile)
@@ -41,12 +43,14 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
             val bundle=Bundle()
             bundle.putParcelable("user",newUserList.get(position))
             intent.putExtra("user",bundle)
+            Log.d(TAG, "onBindViewHolder: id is"+userId)
             intent.putExtra("userid",userId)
             holder.user.context.startActivity(intent)
         }
     }
 
     override fun getItemCount(): Int {
+        Log.d(TAG, "getItemCount: ")
         return newUserList.size
     }
 
@@ -71,8 +75,9 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
                             Log.d(SearchUsersAdapter.TAG, "InFiltering: "+it.get("username"))
 
                             val us=User(it.get("userid").toString().toInt(),it.get("username").toString(),it.get("user_profile").toString())
-
-                            filters.add(us)
+                            if(us.userId!=userId) {
+                                filters.add(us)
+                            }
                             newUserList.add(us)
                             publishResults(constraint,FilterResults().apply { values=filters })
                         }
@@ -94,6 +99,10 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
                     Log.d(TAG, "publishResults: "+results.values.toString())
 
                     newUserList.addAll(results.values as Collection<User>)
+                    notifyDataSetChanged()
+                }
+                else{
+                    newUserList.addAll(searchedUserList)
                     notifyDataSetChanged()
                 }
             }

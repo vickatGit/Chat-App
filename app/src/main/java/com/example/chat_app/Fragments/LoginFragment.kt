@@ -47,14 +47,20 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         loginViewModel=ViewModelProvider(this).get(LoginViewModel::class.java)
         val observer= Observer<User> {
             Log.d("TAG", "Login View Observer : "+it.userId  )
             if(it!=null){
                 UserLoginSignUpDatabase.getInstance(MainActivity.context)?.getUserLoginDao()?.insertUser(
-                    SqlUserEntity(null, username.text.toString(),it.toString()))
+                    SqlUserEntity(null, username.text.toString(),it.userId.toString()))
                 Log.d("TAG","onViewCreated: in sqLite Database " + UserLoginSignUpDatabase.getInstance(this.requireContext())?.getUserLoginDao()?.getUser())
+                val sqlUser=UserLoginSignUpDatabase.getInstance(this.requireContext())?.getUserLoginDao()?.getUser()
+                val user=User(sqlUser?.dataId?.toInt(),sqlUser?.username.toString(),"")
+                val bundle:Bundle= Bundle()
+                bundle.putParcelable(MainActivity.USER,user)
                 val intent= Intent(this.context, ChatsActivity::class.java)
+                intent.putExtra(MainActivity.USER,bundle)
                 startActivity(intent)
             }
         }

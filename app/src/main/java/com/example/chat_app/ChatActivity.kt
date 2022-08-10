@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.*
@@ -102,24 +103,39 @@ class ChatActivity : AppCompatActivity() {
                     messages.addAll(recieverMessages)
                     messages.sortBy { it.createdAt }
                     chatAdapter.notifyDataSetChanged()
-                if(messages.size>=0) {
-                    Log.d("TAG", "onCreate: size of messages  "+chatAdapter.itemCount)
-//                    chats.smoothScrollToPosition(chatAdapter.itemCount - 1)
+//                if(messages.size>=0) {
+//                    Log.d("TAG", "onCreate: size of messages  "+chatAdapter.itemCount)
+                    if(chatAdapter.itemCount>=1) {
+                        chats.smoothScrollToPosition(chatAdapter.itemCount - 1)
+//                    }
                 }
             })
 
-
-        db.collection("USERS").document(id.toString()).get().addOnCompleteListener(
-            OnCompleteListener {
-                friends = it.result.data?.get("friends") as ArrayList<String>
-                friends.add(id.toString())
-
-            })
-
-        db.collection("USERS").document(id.toString()).update("friends",friends).addOnCompleteListener(
-            OnCompleteListener {
+        val som= hashMapOf(
+            "friend" to user.userId.toString()
+        )
+        db.collection("USERS").document(id.toString()).collection("friends").document(user.userId.toString())
+            .set(som, SetOptions.merge()).addOnSuccessListener {
                 Log.d("TAG", "onCreate: friend added successfully")
-            })
+            }
+
+//        db.collection("USERS").document(id.toString()).get().addOnCompleteListener(
+//            OnCompleteListener {
+//                val fris=it.result.get("friends") as ArrayList<String>
+//                fris.iterator().forEach {
+//
+//                }
+//
+//                friends = it.result.data?.get("friends") as Array<String>
+//                friends.add(id.toString())
+//
+//            })
+
+//        db.collection("USERS").document(id.toString()).update()
+//        db.collection("USERS").document(id.toString()).update("friends",friends).addOnCompleteListener(
+//            OnCompleteListener {
+//                Log.d("TAG", "onCreate: friend added successfully")
+//            })
         back.setOnClickListener {
             finish()
         }
