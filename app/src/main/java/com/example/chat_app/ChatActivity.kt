@@ -2,11 +2,13 @@ package com.example.chat_app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Message
 import android.util.Log
 import androidx.core.content.res.ResourcesCompat.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -20,11 +22,15 @@ import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ChatActivity : AppCompatActivity() {
     val db=Firebase.firestore
+    private var chatHashes:HashMap<String,MessageModel> = HashMap()
 
     private lateinit var messageInput:EditText
     private lateinit var userName:TextView
@@ -47,7 +53,8 @@ class ChatActivity : AppCompatActivity() {
         val bundle=intent.getBundleExtra("user")
         val user: User? =bundle?.getParcelable<User>("user")
         val id=intent.getIntExtra("userid",-1)
-        Log.d("TAG", "onCreate: user to send"+id)
+        val user_token=intent.getStringExtra("user_token")
+        Log.d("TAG", "onCreate: user to send $id  and token is $user_token")
         messageInput=findViewById(R.id.message)
         send=findViewById(R.id.send)
         userProfile=findViewById(R.id.user_profile)
@@ -70,21 +77,24 @@ class ChatActivity : AppCompatActivity() {
         db.collection("MESSAGES").whereIn("from" , listOf(id,user!!.userId)).whereEqualTo("to",id).addSnapshotListener(
             EventListener { value, error ->
                 Log.d("TAG", "onCreate: in snapshot listener  reciever id is $id and sender id is ${user.userId} "+value?.documents?.size)
-                recieverMessages.clear()
+//                recieverMessages.clear()
+                messages.clear()
                 value?.documents?.listIterator()?.forEach {
                     val message=MessageModel(it.get("message").toString()
                         ,it.get("from").toString().toInt()
-                        ,it.get("to").toString().toInt(),it.getTimestamp("createdAt")!!)
-                    Log.d("TAG", "onCreate: ChatsActivity message "+message.toString())
-                    recieverMessages.add(message)
+                        ,it.get("to").toString().toInt(),it.getTimestamp("createdAt")!!,it.get("messageid").toString())
+//                    Log.d("TAG", "onCreate: ChatsActivity message "+message.toString())
+//                    recieverMessages.add(message)
+                    chatHashes.put(message.messageid,message)
+                    Log.d("messages", "onCreate: reciever messages"+message)
 
                 }
-                messages.addAll(recieverMessages)
+                messages.addAll(chatHashes.values)
                 messages.sortBy { it.createdAt }
                 chatAdapter.notifyDataSetChanged()
-                if(recieverMessages.size>=0) {
+                if(chatAdapter.getItemCount() >=1) {
                     Log.d("TAG", "onCreate: size of messages  "+chatAdapter.itemCount)
-//                    chats.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                    chats.smoothScrollToPosition(chatAdapter.itemCount - 1)
                 }
             })
         db.collection("MESSAGES").whereIn("from" , listOf(id,user!!.userId)).whereEqualTo("to",user!!.userId).addSnapshotListener(
@@ -94,18 +104,21 @@ class ChatActivity : AppCompatActivity() {
                 value?.documents?.listIterator()?.forEach {
                     val message=MessageModel(it.get("message").toString()
                         ,it.get("from").toString().toInt()
-                        ,it.get("to").toString().toInt(),it.getTimestamp("createdAt")!!)
-                    Log.d("TAG", "onCreate: ChatsActivity message "+message.toString())
-                    messages.add(message)
+                        ,it.get("to").toString().toInt(),it.getTimestamp("createdAt")!!,it.get("messageid").toString())
+//                    Log.d("TAG", "onCreate: ChatsActivity message "+message.toString())
+//                    messages.add(message)
+                    chatHashes.put(message.messageid,message)
+                    Log.d("messages", "onCreate: sender Messages"+message)
 
                 }
 
-                    messages.addAll(recieverMessages)
+                    messages.addAll(chatHashes.values)
                     messages.sortBy { it.createdAt }
                     chatAdapter.notifyDataSetChanged()
 //                if(messages.size>=0) {
 //                    Log.d("TAG", "onCreate: size of messages  "+chatAdapter.itemCount)
                     if(chatAdapter.itemCount>=1) {
+                        Log.d("TAG", "onCreate: scrolled")
                         chats.smoothScrollToPosition(chatAdapter.itemCount - 1)
 //                    }
                 }
@@ -140,12 +153,34 @@ class ChatActivity : AppCompatActivity() {
             finish()
         }
         send.setOnClickListener {
-            val message=MessageModel(messageInput.text.toString(),id!!.toInt(),user!!.userId!!,Timestamp(Date()))
-            messageInput.setText("")
-            db.collection("MESSAGES").document().set(message).addOnCompleteListener(
+            val msg=RemoteMessage.Builder("@fcm.googleapis.com").setData(hashMapOf("message" to messageInput.text.toString(),
+                                                                "userid" to user.userId.toString())).build()
+
+            FirebaseMessaging.getInstance().send(msg)
+            val ref=db.collection("MESSAGES").document()
+            Log.d("real", "onCreate: a real message "+messageInput.text)
+            val message=MessageModel(messageInput.text.toString(),id!!.toInt(),user!!.userId!!,Timestamp(Date()),ref.toString())
+            db.collection("MESSAGES").document(ref.toString()).set(message).addOnCompleteListener(
                 OnCompleteListener {
                     if(it.isSuccessful){
                         Log.d("TAG", "onCreate: "+it.result)
+                        db.collection("USERS").document(user.userId.toString()).collection("friends").document(id.toString()).set(hashMapOf("latest_message" to message.message),
+                            SetOptions.merge()).addOnCompleteListener {
+                                if(it.isSuccessful){
+                                    Log.d("TAG", "onCreate: latest message is successful")
+                                }
+                                else
+                                    Log.d("TAG", "onCreate: latest message is unsuccessful")
+                        }
+                        db.collection("USERS").document(id.toString()).collection("friends").document(user.userId.toString()).set(hashMapOf("latest_message" to message.message),
+                            SetOptions.merge()).addOnCompleteListener {
+                            if(it.isSuccessful){
+                                Log.d("TAG", "onCreate: latest message is successful")
+                            }
+                            else
+                                Log.d("TAG", "onCreate: latest message is unsuccessful")
+                        }
+
                     }
                     else
                         Log.d("TAG", "onCreate: failed ro store meaage"+it.exception)

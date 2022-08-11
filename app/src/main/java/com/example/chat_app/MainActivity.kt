@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             val sqlUser=UserLoginSignUpDatabase.getInstance(this)?.getUserLoginDao()?.getUser()
             val userId =sqlUser?.dataId
             Log.d("TAG", "onCreate: the iD That Cannot be cast is ${userId} and the or is ${userId.toString()}")
-            val user=User(userId?.toInt(),sqlUser?.username.toString(),"")
+            val user=User(userId?.toInt(),sqlUser?.username.toString(),"",null)
             val bundle:Bundle= Bundle()
             bundle.putParcelable(USER,user)
             val intent:Intent= Intent(this, ChatsActivity::class.java)

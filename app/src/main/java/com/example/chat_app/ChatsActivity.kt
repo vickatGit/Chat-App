@@ -29,6 +29,7 @@ import com.example.chat_app.ViewModels.ChatsActivityViewModel
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
@@ -51,6 +52,7 @@ class ChatsActivity : AppCompatActivity() {
     private lateinit var allFriendsAdapter:SearchUsersAdapter
     private lateinit var allFriendsChatsAdapter:chatsAdapter
     val db=Firebase.firestore
+    private var userToken:String=""
 
 
     private var id:String=""
@@ -100,6 +102,13 @@ class ChatsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chats)
+
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {
+            if(it.isSuccessful){
+                userToken=it.result.token
+                Log.d("TAG", "onCreate: userToken in block $userToken")
+            }
+        }
         chatsViewModel=ViewModelProvider(this).get(ChatsActivityViewModel::class.java)
         Log.d("TAG", "onCreate: USER_ID"+intent.getStringExtra(MainActivity.USER_ID))
         chatsViewModel.setUser(intent.getStringExtra(MainActivity.USER_ID),intent.getStringExtra(MainActivity.USER_NAME))
@@ -132,12 +141,12 @@ class ChatsActivity : AppCompatActivity() {
                 var firestoreObject:FirestoreObject
                 Log.d("TAG", "onCreate: user_profile is "+user_profile)
                 if(user_profile!=default_avatar ){
-                    firestoreObject = FirestoreObject(userName,id,user_profile)
+                    firestoreObject = FirestoreObject(userName,id,user_profile,userToken)
                 }else{
-                    firestoreObject= FirestoreObject(userName,id,default_avatar)
+                    firestoreObject= FirestoreObject(userName,id,default_avatar,userToken)
                 }
                 Log.d("TAG", "onCreate: firestore object is "+firestoreObject.toString())
-                db.collection("USERS").document(id).set(firestoreObject)
+                db.collection("USERS").document(id).set(firestoreObject, SetOptions.merge())
             }
         }
 
@@ -200,7 +209,8 @@ class ChatsActivity : AppCompatActivity() {
                     if(it.isSuccessful){
                         val obj=FirestoreObject(it.result.get("username").toString()
                             ,it.result.get("userid").toString()
-                            ,it.result.get("user_profile").toString())
+                            ,it.result.get("user_profile").toString()
+                            ,it.result.get("user_token").toString())
                         allFriendsChatsList.add(obj)
                         allFriendsChatsAdapter.notifyDataSetChanged()
 

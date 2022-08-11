@@ -14,6 +14,7 @@ data class User(
     var userId:Int?,
     val username:String,
     @Ignore
-    val password:String
+    val password:String,
+    val userToken:String?
 
 ) : Parcelable

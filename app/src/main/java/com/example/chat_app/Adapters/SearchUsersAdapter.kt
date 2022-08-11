@@ -74,7 +74,7 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
                         it.result.documents.forEach{
                             Log.d(SearchUsersAdapter.TAG, "InFiltering: "+it.get("username"))
 
-                            val us=User(it.get("userid").toString().toInt(),it.get("username").toString(),it.get("user_profile").toString())
+                            val us=User(it.get("userid").toString().toInt(),it.get("username").toString(),it.get("user_profile").toString(),it.get("user_token").toString())
                             if(us.userId!=userId) {
                                 filters.add(us)
                             }

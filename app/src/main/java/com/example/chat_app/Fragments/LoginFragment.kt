@@ -56,7 +56,7 @@ class LoginFragment : Fragment() {
                     SqlUserEntity(null, username.text.toString(),it.userId.toString()))
                 Log.d("TAG","onViewCreated: in sqLite Database " + UserLoginSignUpDatabase.getInstance(this.requireContext())?.getUserLoginDao()?.getUser())
                 val sqlUser=UserLoginSignUpDatabase.getInstance(this.requireContext())?.getUserLoginDao()?.getUser()
-                val user=User(sqlUser?.dataId?.toInt(),sqlUser?.username.toString(),"")
+                val user=User(sqlUser?.dataId?.toInt(),sqlUser?.username.toString(),"",null)
                 val bundle:Bundle= Bundle()
                 bundle.putParcelable(MainActivity.USER,user)
                 val intent= Intent(this.context, ChatsActivity::class.java)
@@ -68,7 +68,7 @@ class LoginFragment : Fragment() {
         initialise(view)
 
         loginBtn.setOnClickListener {
-            loginViewModel.isUserExist(User(null, username.text.toString(),password.text.toString()))
+            loginViewModel.isUserExist(User(null, username.text.toString(),password.text.toString(),null))
         }
 
 

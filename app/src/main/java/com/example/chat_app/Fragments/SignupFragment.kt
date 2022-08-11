@@ -64,7 +64,7 @@ class SignupFragment : Fragment() {
                         ?.getUserLoginDao()?.getUser()
                 )
                 val sqlUser=UserLoginSignUpDatabase.getInstance(this.requireContext())?.getUserLoginDao()?.getUser()
-                val user=User(sqlUser?.dataId?.toInt(),sqlUser?.username.toString(),"")
+                val user=User(sqlUser?.dataId?.toInt(),sqlUser?.username.toString(),"",null)
                 val bundle:Bundle= Bundle()
                 bundle.putParcelable(MainActivity.USER,user)
                 val intent=Intent(this.context,ChatsActivity::class.java)
@@ -85,7 +85,7 @@ class SignupFragment : Fragment() {
 
         signUpBtn.setOnClickListener {
             if (checkValidPassword(password.text.toString(), confirmPassword.text.toString())) {
-                val user: User = User(null, username.text.toString(), password.text.toString())
+                val user: User = User(null, username.text.toString(), password.text.toString(),null)
 
                 viewModel.createUser(user)
             }
