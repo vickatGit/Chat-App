@@ -29,7 +29,12 @@ class chatsAdapter(val friends:ArrayList<FirestoreObject>,val userId:Int) : Recy
             .collection("friends").document(friends.get(position).userid).get().addOnCompleteListener {
                 if(it.isSuccessful){
                     val latest_message=it.result.get("latest_message").toString()
-                    holder.latestMessage.text=latest_message
+                    Log.d("latest message", "onBindViewHolder: "+latest_message)
+
+                    if(latest_message!=null){
+                        holder.latestMessage.text=latest_message
+                    }else{
+                    }
                 }
             }
         Log.d("TAG", "onBindViewHolder: chatsAdapter")

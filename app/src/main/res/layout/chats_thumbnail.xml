@@ -35,9 +35,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxWidth="300dp"
-        android:textSize="17sp"
-        android:visibility="gone"
-        android:textStyle="bold"
+        android:textSize="15sp"
+        android:visibility="visible"
+
         android:text="Latest Message Appears Here"
         app:layout_constraintBottom_toBottomOf="@+id/thumb_user_profile"
         app:layout_constraintStart_toStartOf="@+id/thumb_user_name"
