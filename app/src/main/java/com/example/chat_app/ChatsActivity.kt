@@ -120,7 +120,7 @@ class ChatsActivity : AppCompatActivity() {
         userName=user?.username.toString()
         friendsList= ArrayList(1)
         allFriendsChatsList= ArrayList(1)
-        allFriendsChatsAdapter=chatsAdapter(allFriendsChatsList,id.toInt())
+        allFriendsChatsAdapter=chatsAdapter(allFriendsChatsList,id.toInt(),userName.toString())
 
         firebaseStorage=FirebaseStorage.getInstance()
         allFriends=findViewById(R.id.allChats)
@@ -161,10 +161,10 @@ class ChatsActivity : AppCompatActivity() {
 
 
         Log.d("TAG", "onCreate: userId is $id and username is $userName")
-        searchUsersAdapter= SearchUsersAdapter(newUserList,id.toInt())
+        searchUsersAdapter= SearchUsersAdapter(newUserList,id.toInt(),userName.toString())
         allFriends=findViewById(R.id.allChats)
         allFriends.layoutManager=LinearLayoutManager(this)
-        allFriendsAdapter= SearchUsersAdapter(friendsList,id.toInt())
+        allFriendsAdapter= SearchUsersAdapter(friendsList,id.toInt(),userName.toString())
         allSearches.adapter=searchUsersAdapter
         allFriends.adapter=allFriendsChatsAdapter
 

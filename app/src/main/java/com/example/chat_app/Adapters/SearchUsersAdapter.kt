@@ -20,7 +20,7 @@ import com.example.chat_app.R
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : RecyclerView.Adapter<SearchUsersAdapter.SearchUserViewHolder>(), Filterable{
+class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int,val userName:String) : RecyclerView.Adapter<SearchUsersAdapter.SearchUserViewHolder>(), Filterable{
 
 
     val db=Firebase.firestore
@@ -45,6 +45,7 @@ class SearchUsersAdapter(var newUserList: ArrayList<User>, val userId: Int) : Re
             intent.putExtra("user",bundle)
             Log.d(TAG, "onBindViewHolder: id is"+userId)
             intent.putExtra("userid",userId)
+            intent.putExtra("username",userName)
             holder.user.context.startActivity(intent)
         }
     }

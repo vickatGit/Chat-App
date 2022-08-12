@@ -14,7 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.chat_app.Adapters.chatRecyclerAdapter
 import com.example.chat_app.Models.MessageModel
+import com.example.chat_app.Network.ApiFetcher
 import com.example.chat_app.Network.Network.User
+import com.example.chat_app.NotificationService.ChatNotification
+import com.example.chat_app.NotificationService.Notify
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.Timestamp
@@ -24,6 +27,12 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.RemoteMessage
+import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -54,6 +63,7 @@ class ChatActivity : AppCompatActivity() {
         val user: User? =bundle?.getParcelable<User>("user")
         val id=intent.getIntExtra("userid",-1)
         val user_token=intent.getStringExtra("user_token")
+        val username=intent.getStringExtra("username")
         Log.d("TAG", "onCreate: user to send $id  and token is $user_token")
         messageInput=findViewById(R.id.message)
         send=findViewById(R.id.send)
@@ -153,10 +163,29 @@ class ChatActivity : AppCompatActivity() {
             finish()
         }
         send.setOnClickListener {
-            val msg=RemoteMessage.Builder("@fcm.googleapis.com").setData(hashMapOf("message" to messageInput.text.toString(),
-                                                                "userid" to user.userId.toString())).build()
 
-            FirebaseMessaging.getInstance().send(msg)
+            val retro= Retrofit.Builder().baseUrl("https://fcm.googleapis.com/fcm/").addConverterFactory(GsonConverterFactory.create()).build().create(ApiFetcher::class.java)
+            val note=ChatNotification(user.userToken.toString(), Notify(username.toString(),messageInput.text.toString()))
+            val gson:Gson= Gson()
+            Log.d("TAG", "onCreate: to json is "+gson.toJson(note))
+            retro.notify(note).enqueue(object :Callback<String>{
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+
+                    Log.d("TAG", "onResponse: notification is successful"+response.body())
+
+
+
+
+                }
+
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    Log.d("TAG", "onFailure: to send notification"+t.localizedMessage)
+
+                }
+
+
+
+            })
             val ref=db.collection("MESSAGES").document()
             Log.d("real", "onCreate: a real message "+messageInput.text)
             val message=MessageModel(messageInput.text.toString(),id!!.toInt(),user!!.userId!!,Timestamp(Date()),ref.toString())

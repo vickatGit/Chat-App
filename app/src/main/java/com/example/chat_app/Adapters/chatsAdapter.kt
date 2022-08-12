@@ -17,7 +17,7 @@ import com.example.chat_app.R
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class chatsAdapter(val friends:ArrayList<FirestoreObject>,val userId:Int) : RecyclerView.Adapter<chatsAdapter.chatsThumbHolder>() {
+class chatsAdapter(val friends:ArrayList<FirestoreObject>,val userId:Int, val username:String) : RecyclerView.Adapter<chatsAdapter.chatsThumbHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): chatsThumbHolder {
         val view=LayoutInflater.from(parent.context).inflate(R.layout.chats_thumbnail,parent,false)
         return chatsThumbHolder(view)
@@ -50,6 +50,7 @@ class chatsAdapter(val friends:ArrayList<FirestoreObject>,val userId:Int) : Recy
             Log.d("TAG", "onBindViewHolder: in chatsAdapter id is"+userId)
             intent.putExtra("user_token",friends.get(position).user_token)
             intent.putExtra("userid",userId)
+            intent.putExtra("username",username)
             holder.user.context.startActivity(intent)
         }
     }
